@@ -19,7 +19,10 @@ namespace WeatherTracker.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll() => Ok(_repo.GetAll());
+        public IActionResult GetAll()
+        {
+            return Ok(_repo.GetAll());
+        }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
@@ -43,6 +46,20 @@ namespace WeatherTracker.Controllers
         {
             if (!_repo.Delete(id)) return NotFound();
             return NoContent();
+        }
+
+        [HttpGet("filter")]
+        public IActionResult FilterWeather(
+            [FromQuery] string? cityName,
+            [FromQuery] string? summary,
+            [FromQuery] int? minTemp,
+            [FromQuery] int? maxTemp,
+            [FromQuery] bool? sortByCityAsc,
+            [FromQuery] bool? sortByTempAsc,
+            [FromQuery] bool? sortByDateAsc)
+        {
+            var result = _repo.FilterAndSort(cityName, summary, minTemp, maxTemp, sortByCityAsc, sortByTempAsc, sortByDateAsc);
+            return Ok(result);
         }
     }
 }

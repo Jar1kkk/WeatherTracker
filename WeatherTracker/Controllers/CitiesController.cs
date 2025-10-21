@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WeatherTracker.Data;
+using System.Net;
+using WeatherTracker.Exceptions;
+using WeatherTracker.Resources;
 using WeatherTracker.Models;
 
 namespace WeatherTracker.Controllers
@@ -22,13 +25,18 @@ namespace WeatherTracker.Controllers
         public IActionResult GetById(int id)
         {
             var city = _repo.GetById(id);
-            if (city == null) return NotFound();
+            if (city == null)
+                throw new HttpStatusCodeException(HttpStatusCode.NotFound, ResourceHelper.GetString("CityNotFound"));
+
             return Ok(city);
         }
 
         [HttpPost]
         public IActionResult Add([FromBody] City city)
         {
+            if (string.IsNullOrWhiteSpace(city.Name))
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, ResourceHelper.GetString("InvalidData"));
+
             var newCity = _repo.Add(city);
             return CreatedAtAction(nameof(GetById), new { id = newCity.Id }, newCity);
         }

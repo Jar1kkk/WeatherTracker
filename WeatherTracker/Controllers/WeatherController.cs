@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using WeatherTracker.Data;
+using WeatherTracker.Exceptions;
 using WeatherTracker.Models;
+using WeatherTracker.Resources;
 
 namespace WeatherTracker.Controllers
 {
@@ -21,9 +24,11 @@ namespace WeatherTracker.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var f = _repo.GetById(id);
-            if (f == null) return NotFound();
-            return Ok(f);
+            var forecast = _repo.GetById(id);
+            if (forecast == null)
+                throw new HttpStatusCodeException(HttpStatusCode.NotFound, ResourceHelper.GetString("WeatherNotFound"));
+
+            return Ok(forecast);
         }
 
         [HttpPost]

@@ -11,17 +11,36 @@ namespace WeatherTracker.Controllers
     [Route("api/[controller]")]
     public class WeatherController : ControllerBase
     {
-        private readonly WeatherRepository _repo;
+        //private readonly WeatherRepository _repo;
 
-        public WeatherController(WeatherRepository repo)
-        {
-            _repo = repo;
-        }
+        //public WeatherController(WeatherRepository repo)
+        //{
+        //    _repo = repo;
+        //}
+
+        private readonly WeatherRepository _repo = new WeatherRepository();
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll(
+                   string? city = null,
+                   string? summary = null,
+                   int? minTemp = null,
+                   int? maxTemp = null,
+                   bool? sortTempAsc = null,
+                   int pageNumber = 1,
+                   int pageSize = 10)
         {
-            return Ok(_repo.GetAll());
+            var pagination = new PaginationParams { PageNumber = pageNumber, PageSize = pageSize };
+
+            var forecasts = _repo.FilterAndSort(
+                cityName: city,
+                summary: summary,
+                minTemp: minTemp,
+                maxTemp: maxTemp,
+                sortByTempAsc: sortTempAsc,
+                pagination: pagination);
+
+            return Ok(forecasts);
         }
 
         [HttpGet("{id}")]
